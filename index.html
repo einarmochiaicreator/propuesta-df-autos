@@ -248,26 +248,6 @@
   .btn .arrow { transition: transform .25s var(--ease); }
   .btn:hover .arrow { transform: translateX(4px); }
 
-  .hero-meta {
-    margin-top: 36px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding-top: 24px;
-    border-top: 1px solid var(--line);
-  }
-  .hero-meta-item .label {
-    font-size: 10px; color: var(--gray); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.8px;
-    margin-bottom: 3px;
-  }
-  .hero-meta-item .value {
-    font-size: 14px; color: var(--navy); font-weight: 700;
-  }
-  .hero-meta-item .value-small {
-    font-size: 11px; color: var(--gray); font-weight: 500;
-    display: block; margin-top: 1px;
-  }
 
   /* =========================================
      SECTION HEADERS
@@ -1102,10 +1082,6 @@
     .hero p.lead { font-size: 19px; max-width: 580px; }
     .hero-actions { flex-direction: row; gap: 14px; }
     .btn { width: auto; }
-    .hero-meta {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-    }
     section h2 { font-size: clamp(36px, 4vw, 46px); }
     .features-grid {
       grid-template-columns: 1fr 1fr;
@@ -1177,26 +1153,6 @@
       <a href="#calculadora" class="btn btn-secondary">
         Calculá el potencial
       </a>
-    </div>
-    <div class="hero-meta reveal delay-3">
-      <div class="hero-meta-item">
-        <div class="label">Plazo</div>
-        <div class="value">3 semanas</div>
-      </div>
-      <div class="hero-meta-item">
-        <div class="label">Setup</div>
-        <div class="value">USD 150
-          <span class="value-small">de USD 500</span>
-        </div>
-      </div>
-      <div class="hero-meta-item">
-        <div class="label">Mensual</div>
-        <div class="value">USD 25 <span class="value-small">desde mes 2</span></div>
-      </div>
-      <div class="hero-meta-item">
-        <div class="label">Stack</div>
-        <div class="value">PWA · Supabase</div>
-      </div>
     </div>
   </div>
 </section>
@@ -1427,10 +1383,10 @@
 <section id="inversion">
   <div class="container">
     <div class="section-num reveal">05 · Inversión</div>
-    <h2 class="reveal delay-1">Precio especial<br>primer cliente einAR.</h2>
+    <h2 class="reveal delay-1">Precio de la<br>primera etapa.</h2>
     <p class="section-lead reveal delay-2">
-      Te ofrecemos un precio por debajo del valor de mercado porque DF Autos es un cliente clave
-      en el arranque de la agencia y queremos construir caso de éxito juntos.
+      Este es el precio para la primera etapa del crecimiento de DF Autos. Cada etapa siguiente del
+      roadmap escala con el negocio y se cotiza según lo que cada una requiera.
     </p>
 
     <div class="pricing-card reveal delay-3">
@@ -1439,11 +1395,11 @@
 
         <div class="price-track">
           <div class="price-track-label">
-            Valor de mercado <span class="market">USD 500</span>
+            Valor de mercado <span class="market">USD 2.500</span>
           </div>
           <div class="price-now" id="priceNow">
             <span class="cur" id="priceCur">USD</span>
-            <span class="num" id="priceCounter">500</span>
+            <span class="num" id="priceCounter">2.500</span>
           </div>
         </div>
 
@@ -1458,8 +1414,9 @@
     </div>
 
     <div class="invite reveal">
-      <strong>Te invitamos a comparar.</strong> Una agencia con experiencia cobra entre USD 500 y
-      USD 2.500 por este desarrollo. Este precio refleja que sos cliente clave del arranque de einAR.
+      <strong>Te invitamos a comparar.</strong> Una agencia con experiencia cobra alrededor de
+      USD 2.500 por este desarrollo. Este precio corresponde a la primera etapa: la base que habilita
+      todas las que vienen después.
     </div>
 
     <div class="monthly-card reveal delay-1">
@@ -1590,13 +1547,16 @@
     return lerpColor('#F59E0B','#10B981', (t-0.5)*2);
   }
 
+  function fmtUsd(n) {
+    return n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+  }
   let priceAnimated = false;
   const priceObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting && !priceAnimated && priceEl) {
         priceAnimated = true;
         priceNow.classList.add('animating');
-        const startVal = 500;
+        const startVal = 2500;
         const endVal = 150;
         const duration = 8000;
         const startTime = performance.now();
@@ -1614,17 +1574,17 @@
             : 1 - Math.pow(-2 * progress + 2, 3) / 2;
           const current = Math.round(startVal - (startVal - endVal) * eased);
           const color = priceColor(eased);
-          priceEl.textContent = current;
+          priceEl.textContent = fmtUsd(current);
           priceEl.style.color = color;
           priceCur.style.color = color;
-          savingsText.textContent = 'Ahorro de USD ' + (startVal - current);
+          savingsText.textContent = 'Ahorro de USD ' + fmtUsd(startVal - current);
 
           if (progress < 1) requestAnimationFrame(step);
           else {
-            priceEl.textContent = endVal;
+            priceEl.textContent = fmtUsd(endVal);
             priceEl.style.color = '#10B981';
             priceCur.style.color = '#10B981';
-            savingsText.textContent = 'Ahorro de USD 350';
+            savingsText.textContent = 'Ahorro de USD ' + fmtUsd(startVal - endVal);
             // Queda en verde con glow para siempre
             priceNow.classList.add('locked');
           }
