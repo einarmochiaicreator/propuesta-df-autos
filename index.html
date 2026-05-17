@@ -765,19 +765,20 @@
     font-family: var(--display-font);
   }
   .price-now .cur {
-    font-size: 26px;
+    font-size: clamp(18px, 5vw, 26px);
     color: var(--blue-bright);
     font-weight: 700;
     transition: color .15s linear;
   }
   .price-now .num {
-    font-size: 92px;
+    font-size: clamp(54px, 16vw, 96px);
     color: white;
     font-weight: 700;
     letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums;
     transition: color .15s linear;
     text-shadow: 0 0 30px rgba(91, 156, 246, 0.3);
+    line-height: 1;
   }
   .price-now.animating .num,
   .price-now.animating .cur {
@@ -1099,7 +1100,6 @@
     .price-row-desktop {
       display: flex; gap: 50px; align-items: flex-end; flex-wrap: wrap;
     }
-    .price-now .num { font-size: 96px; }
     .monthly-card {
       display: grid;
       grid-template-columns: auto 1fr;
