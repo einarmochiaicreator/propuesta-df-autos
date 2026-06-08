@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0F1B3D">
+<title>DF Autos · Demo PWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0F1B3D;
+    --navy-deep: #060D24;
+    --navy-soft: #1E2F5C;
+    --blue: #5B9CF6;
+    --blue-bright: #7DB1FF;
+    --blue-soft: rgba(91, 156, 246, 0.08);
+    --gray: #6B7280;
+    --gray-light: #9CA3AF;
+    --bg: #FFFFFF;
+    --bg-soft: #F8FAFC;
+    --bg-darker: #F1F5F9;
+    --line: #E5E7EB;
+    --green: #10B981;
+    --green-soft: rgba(16, 185, 129, 0.1);
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --amber-soft: rgba(245, 158, 11, 0.1);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --display: 'Space Grotesk', 'Inter', sans-serif;
+  }
+  html, body { height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--navy);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(91, 156, 246, 0.15), transparent 70%),
+      linear-gradient(180deg, #EEF2F7 0%, #DDE3EC 100%);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* =============== PHONE FRAME (desktop only) =============== */
+  .phone-stage {
+    position: relative;
+    width: 100%;
+    max-width: 393px;
+    height: 100vh;
+    max-height: 852px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  @media (min-width: 640px) {
+    body { padding: 30px 0; }
+    .phone-stage {
+      border-radius: 50px;
+      box-shadow:
+        0 0 0 12px #1A1A1A,
+        0 0 0 13px #2A2A2A,
+        0 40px 100px rgba(0, 0, 0, 0.4),
+        0 20px 60px rgba(15, 27, 61, 0.3);
+      height: 800px;
+    }
+    .phone-stage::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 28px;
+      background: #1A1A1A;
+      border-radius: 0 0 18px 18px;
+      z-index: 1000;
+    }
+  }
+
+  /* =============== APP SHELL =============== */
+  .app {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar simulada */
+  .status-bar {
+    height: 32px;
+    padding: 10px 22px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    position: relative;
+    z-index: 10;
+  }
+  .status-bar .time { font-family: var(--display); font-weight: 700; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+  .status-bar .icons svg { width: 14px; height: 14px; }
+
+  /* App top bar */
+  .topbar {
+    padding: 8px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+  }
+  .greet { display: flex; flex-direction: column; gap: 1px; }
+  .greet .hi { font-size: 12px; color: var(--gray); font-weight: 600; }
+  .greet .name { font-size: 17px; font-weight: 700; color: var(--navy); font-family: var(--display); }
+  .avatar {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--blue), var(--navy));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 14px rgba(15, 27, 61, 0.2);
+    border: 2px solid white;
+  }
+  .topbar-right { display: flex; gap: 10px; align-items: center; }
+  .icon-btn {
+    width: 40px; height: 40px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all .2s var(--ease);
+  }
+  .icon-btn:active { transform: scale(0.94); }
+  .icon-btn svg { width: 18px; height: 18px; stroke: var(--navy); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-btn .dot {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  /* ===== Scrollable views container ===== */
+  .views {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .view {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 90px;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s linear .35s;
+  }
+  .view.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s;
+  }
+  /* hide scrollbar but keep functional */
+  .view::-webkit-scrollbar { display: none; }
+  .view { scrollbar-width: none; }
+
+  /* =============== BOTTOM NAV =============== */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 78px;
+    padding: 8px 16px 16px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(15, 27, 61, 0.06);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    z-index: 30;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 4px;
+    border-radius: 12px;
+    transition: all .2s var(--ease);
+    color: var(--gray);
+    background: transparent;
+    border: none;
+    font-family: inherit;
+  }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .nav-item .label {
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+  .nav-item.active {
+    color: var(--navy);
+  }
+  .nav-item.active svg { stroke: var(--blue); }
+
+  /* =============== STOCK VIEW =============== */
+  .stock-top {
+    padding: 0 20px 16px;
+  }
+  .quick-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card.dark {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: white;
+    border-color: var(--navy);
+    box-shadow: 0 10px 24px rgba(15, 27, 61, 0.25);
+  }
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .stat-card.dark .label { color: var(--blue-bright); }
+  .stat-card .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+    font-family: var(--display);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-card.dark .value { color: white; }
+  .stat-card .delta {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .stat-card.dark .delta { color: var(--blue-bright); }
+  .stat-card .glow {
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: var(--blue);
+    opacity: 0.18;
+    filter: blur(20px);
+  }
+
+  /* Section header */
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .sec-head h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    font-family: var(--display);
+    letter-spacing: -0.01em;
+  }
+  .sec-head .link {
+    font-size: 12px;
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  /* Filter chips */
+  .chips {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 14px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    padding: 7px 14px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gray);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all .2s var(--ease);
+    font-family: inherit;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.active {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+  }
+  .chip .count {
+    margin-left: 4px;
+    opacity: 0.6;
+    font-weight: 700;
+  }
+
+  /* Car list */
+  .car-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 20px;
+  }
+  .car-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .25s var(--ease);
+    box-shadow: 0 1px 2px rgba(15, 27, 61, 0.03);
+  }
+  .car-card:active {
+    transform: scale(0.985);
+    box-shadow: 0 8px 24px rgba(15, 27, 61, 0.1);
+  }
+  .car-photo {
+    height: 165px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1F2937, #0F1B3D);
+  }
+  .car-photo .car-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform .5s var(--ease);
+  }
+  .car-card:hover .car-photo .car-img { transform: scale(1.04); }
+  .car-photo .silhouette {
+    width: 88%;
+    opacity: 0.92;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+  }
+  .car-photo .fallback-svg { width: 100%; height: 100%; display: none; align-items: center; justify-content: center; }
+  .car-photo .fallback-svg.visible { display: flex; }
+  .car-photo .status-tag {
+    position: absolute;
+    top: 10px; right: 10px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .status-tag.disponible {
+    background: rgba(16, 185, 129, 0.95);
+    color: white;
+  }
+  .status-tag.reservado {
+    background: rgba(245, 158, 11, 0.95);
+    color: white;
+  }
+  .status-tag.vendido {
+    background: rgba(107, 114, 128, 0.9);
+    color: white;
+  }
+  .car-info {
+    padding: 12px 14px 14px;
+  }
+  .car-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .car-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    font-family: var(--display);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .car-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--navy);
+    font-family: var(--display);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .car-price .cur { font-size: 11px; color: var(--blue); font-weight: 700; }
+  .car-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+  .car-meta .item { display: flex; align-items: center; gap: 4px; }
+  .car-meta .item svg { width: 13px; height: 13px; stroke: var(--gray); stroke-width: 1.7; fill: none; }
+  .car-meta .margin {
+    margin-left: auto;
+    color: var(--green);
+    font-weight: 700;
+    background: var(--green-soft);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 96px;
+    right: 20px;
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--navy) 100%);
+    border: none;
+    color: white;
+    box-shadow:
+      0 12px 30px rgba(91, 156, 246, 0.4),
+      0 4px 10px rgba(15, 27, 61, 0.2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 25;
+    transition: all .25s var(--ease);
+  }
+  .fab:active { transform: scale(0.92); }
+  .fab svg { width: 26px; height: 26px; stroke: white; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* =============== DETAIL VIEW =============== */
+  .detail-hero {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1F2937, #0F1B3D);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(15, 27, 61, 0.7) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .detail-hero .car-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .detail-hero .silhouette { width: 80%; max-width: 360px; filter: drop-shadow(0 12px 16px rgba(0,0,0,0.4)); }
+  .detail-hero .fallback-svg { width: 100%; height: 100%; display: none; align-items: center; justify-content: center; }
+  .detail-hero .fallback-svg.visible { display: flex; }
+  .detail-back {
+    position: absolute;
+    top: 12px; left: 16px;
+    width: 40px; height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+  }
+  .detail-back svg { width: 20px; height: 20px; stroke: white; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .detail-hero .photo-pills {
+    position: absolute;
+    bottom: 16px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 6px;
+  }
+  .photo-pills .pill {
+    width: 30px; height: 4px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+  }
+  .photo-pills .pill.active {
+    background: white;
+    width: 40px;
+  }
+  .detail-body {
+    padding: 20px 20px 0;
+  }
+  .detail-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .detail-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+    font-family: var(--display);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .detail-status {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--green-soft);
+    color: var(--green);
+  }
+  .detail-sub {
+    font-size: 13.5px;
+    color: var(--gray);
+    margin-bottom: 18px;
+  }
+  .price-block-large {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .price-block-large .label {
+    font-size: 11px; color: var(--gray);
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .price-block-large .amount {
+    display: flex; align-items: baseline; gap: 4px;
+    font-family: var(--display);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .price-block-large .amount .cur { font-size: 16px; color: var(--blue); font-weight: 700; }
+  .price-block-large .amount .num { font-size: 34px; color: var(--navy); font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .price-block-large .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .pill-btn {
+    padding: 11px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all .2s var(--ease);
+    border: 1px solid var(--line);
+    background: white;
+    color: var(--navy);
+    font-family: inherit;
+  }
+  .pill-btn:active { transform: scale(0.96); }
+  .pill-btn.primary {
+    background: linear-gradient(135deg, var(--navy), var(--navy-soft));
+    color: white;
+    border-color: var(--navy);
+  }
+  .pill-btn.green {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    border-color: #059669;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  }
+  .pill-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Specs grid */
+  .specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .spec {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .spec .label {
+    font-size: 10.5px; color: var(--gray);
+    text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .spec .value {
+    font-size: 14px;
+    color: var(--navy);
+    font-weight: 700;
+    font-family: var(--display);
+  }
+
+  /* Internal info (cost/margin) - only socios */
+  .internal-block {
+    background: var(--navy);
+    color: white;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .internal-block::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 130px; height: 130px;
+    background: var(--blue);
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(20px);
+  }
+  .internal-block .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .internal-block .header .ti {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--blue-bright);
+    letter-spacing: 1px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .internal-block .header .ti svg { width: 12px; height: 12px; stroke: var(--blue-bright); stroke-width: 2; fill: none; }
+  .internal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .internal-row:last-child { border-bottom: none; padding-top: 12px; }
+  .internal-row .val { font-weight: 700; color: white; font-family: var(--display); }
+  .internal-row.total .val { color: var(--blue-bright); font-size: 16px; }
+
+  /* =============== CARGAR NUEVO VIEW =============== */
+  .form-section {
+    padding: 0 20px;
+  }
+  .form-section h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+    font-family: var(--display);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .form-section .sub {
+    font-size: 13.5px;
+    color: var(--gray);
+    margin-bottom: 22px;
+  }
+  .upload-area {
+    background: white;
+    border: 2px dashed var(--line);
+    border-radius: 16px;
+    padding: 26px 20px;
+    text-align: center;
+    margin-bottom: 18px;
+    cursor: pointer;
+    transition: all .25s var(--ease);
+  }
+  .upload-area:hover, .upload-area:active {
+    border-color: var(--blue);
+    background: var(--blue-soft);
+  }
+  .upload-area .icon-wrap {
+    width: 52px; height: 52px;
+    background: var(--blue-soft);
+    border-radius: 14px;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .upload-area .icon-wrap svg { width: 24px; height: 24px; stroke: var(--blue); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .upload-area .text {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .upload-area .hint {
+    font-size: 12px;
+    color: var(--gray);
+  }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .input, .select {
+    width: 100%;
+    padding: 12px 14px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-size: 14px;
+    color: var(--navy);
+    font-family: inherit;
+    font-weight: 500;
+    transition: all .2s var(--ease);
+  }
+  .input:focus, .select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .row-2 .field { margin-bottom: 0; }
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 18px;
+    box-shadow: 0 12px 30px rgba(15, 27, 61, 0.25);
+    font-family: inherit;
+    transition: all .25s var(--ease);
+  }
+  .submit-btn:active { transform: scale(0.98); }
+
+  /* =============== CALCULATOR / SIMULATOR =============== */
+  .calc-section { padding: 0 20px; }
+  .calc-section h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+    font-family: var(--display);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .calc-section .sub {
+    font-size: 13.5px;
+    color: var(--gray);
+    margin-bottom: 18px;
+  }
+  .calc-out {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: white;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 18px 40px rgba(15, 27, 61, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  .calc-out::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 150px; height: 150px;
+    background: var(--blue);
+    border-radius: 50%;
+    opacity: 0.2;
+    filter: blur(30px);
+  }
+  .calc-out > * { position: relative; z-index: 1; }
+  .calc-out .lab {
+    font-size: 11px;
+    color: var(--blue-bright);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .calc-out .cuota {
+    display: flex; align-items: baseline; gap: 4px;
+    font-family: var(--display);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .calc-out .cuota .cur { font-size: 18px; color: var(--blue-bright); font-weight: 700; }
+  .calc-out .cuota .num { font-size: 40px; color: white; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .calc-out .cuota .per { font-size: 13px; color: rgba(255,255,255,0.55); margin-left: 4px; }
+  .calc-extras {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .calc-extras .item .lb {
+    font-size: 10.5px; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .calc-extras .item .vl {
+    font-size: 14.5px; color: white; font-weight: 700;
+    font-family: var(--display); font-variant-numeric: tabular-nums;
+  }
+
+  .slider-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .slider-card .head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .slider-card .lb {
+    font-size: 11.5px; color: var(--gray);
+    text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;
+  }
+  .slider-card .vl {
+    font-size: 16px; color: var(--navy); font-weight: 800;
+    font-family: var(--display); letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .slider-card .vl .pre { font-size: 10px; color: var(--blue); margin-right: 3px; font-weight: 700; }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to right, var(--blue) 0%, var(--blue) var(--val, 50%), var(--line) var(--val, 50%), var(--line) 100%);
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    background: white;
+    border: 3px solid var(--blue);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(15, 27, 61, 0.15);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px; height: 20px;
+    background: white;
+    border: 3px solid var(--blue);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(15, 27, 61, 0.15);
+  }
+
+  /* =============== PERFIL VIEW =============== */
+  .profile-card {
+    margin: 0 20px 16px;
+    padding: 24px 20px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    border-radius: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 130px; height: 130px;
+    background: var(--blue);
+    border-radius: 50%;
+    opacity: 0.18;
+    filter: blur(20px);
+  }
+  .profile-card .av-big {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    border: 3px solid rgba(255,255,255,0.2);
+    z-index: 1;
+  }
+  .profile-card .info { z-index: 1; }
+  .profile-card .name {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--display);
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .profile-card .role {
+    font-size: 12.5px;
+    color: var(--blue-bright);
+    font-weight: 600;
+  }
+  .menu-list {
+    margin: 0 20px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background .2s var(--ease);
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:active { background: var(--bg-soft); }
+  .menu-item .ic-wrap {
+    width: 36px; height: 36px;
+    background: var(--blue-soft);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .menu-item .ic-wrap svg { width: 18px; height: 18px; stroke: var(--blue); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .menu-item .title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    flex: 1;
+  }
+  .menu-item .arr {
+    width: 16px; height: 16px;
+    stroke: var(--gray-light);
+    stroke-width: 2;
+    fill: none;
+  }
+  .partner-card {
+    margin: 16px 20px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .partner-card .av {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--amber), #D97706);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 13px;
+  }
+  .partner-card .body { flex: 1; }
+  .partner-card .pname { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+  .partner-card .pstatus { font-size: 11.5px; color: var(--gray); display: flex; gap: 4px; align-items: center; }
+  .partner-card .pstatus::before {
+    content: ''; width: 7px; height: 7px; background: var(--green); border-radius: 50%;
+  }
+
+  /* =============== SHARE MODAL =============== */
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 27, 61, 0.5);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s var(--ease), visibility 0s linear .3s;
+    z-index: 100;
+  }
+  .modal-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .3s var(--ease);
+  }
+  .modal {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 30px;
+    transform: translateY(100%);
+    transition: transform .35s var(--ease);
+    max-height: 80%;
+    overflow-y: auto;
+  }
+  .modal.show { transform: translateY(0); }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--line);
+    border-radius: 999px;
+    margin: 0 auto 18px;
+  }
+  .modal h3 {
+    font-size: 17px;
+    font-weight: 800;
+    font-family: var(--display);
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .modal .sub {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 18px;
+  }
+  .share-preview {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .share-preview .ph {
+    height: 110px;
+    background: linear-gradient(180deg, #2C3E50, #0F1B3D);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .share-preview .ph svg { width: 80%; opacity: 0.92; }
+  .share-preview .meta {
+    padding: 12px 14px;
+  }
+  .share-preview .meta .t {
+    font-size: 14px; font-weight: 700; color: var(--navy);
+    font-family: var(--display); margin-bottom: 4px;
+  }
+  .share-preview .meta .p {
+    font-size: 13px; color: var(--gray);
+  }
+  .share-preview .meta .p strong { color: var(--green); font-weight: 700; }
+  .share-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .share-wa {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+  }
+  .share-link {
+    background: white;
+    color: var(--navy);
+    border: 1px solid var(--line);
+  }
+
+  /* =============== TOAST =============== */
+  .toast {
+    position: absolute;
+    top: 50px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--navy);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 14px 30px rgba(15, 27, 61, 0.3);
+    z-index: 200;
+    opacity: 0;
+    transition: all .3s var(--ease);
+    display: flex; align-items: center; gap: 8px;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* hide branding */
+  .powered {
+    position: fixed;
+    top: 10px; right: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--navy);
+    z-index: 1100;
+    border: 1px solid rgba(15, 27, 61, 0.1);
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .powered { display: inline-flex; align-items: center; gap: 5px; }
+    .powered .b { color: var(--blue); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== POWERED BY (desktop only) ========== -->
+<div class="powered">Demo PWA · construida por <strong>ein<span class="b">AR</span></strong></div>
+
+<!-- ========== PHONE STAGE (frame visible only on desktop) ========== -->
+<div class="phone-stage">
+  <div class="app">
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h2V11H2v11zm5 0h2V8H7v14zm5 0h2V4h-2v18zm5 0h2v-7h-2v7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C13.14 9.14 7.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><rect x="4" y="9" width="14" height="6" rx="1" fill="currentColor"/></svg>
+      </span>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="topbar" id="topbar">
+      <div class="greet">
+        <span class="hi">¡Buenos días!</span>
+        <span class="name">Franco S.</span>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <button class="icon-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="dot"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEWS -->
+    <div class="views">
+
+      <!-- ========== STOCK VIEW ========== -->
+      <div class="view active" id="view-stock">
+        <div class="stock-top">
+          <div class="quick-stats">
+            <div class="stat-card dark">
+              <div class="glow"></div>
+              <div class="label">Ganancia proyectada</div>
+              <div class="value">USD 8.250</div>
+              <div class="delta">+12% vs mes anterior</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Stock activo</div>
+              <div class="value">6 autos</div>
+              <div class="delta">2 reservados</div>
+            </div>
+          </div>
+
+          <div class="sec-head">
+            <h2>Stock</h2>
+            <span class="link">Ver todo →</span>
+          </div>
+
+          <div class="chips">
+            <button class="chip active">Todos <span class="count">6</span></button>
+            <button class="chip">Disponible <span class="count">3</span></button>
+            <button class="chip">Reservado <span class="count">2</span></button>
+            <button class="chip">Vendido <span class="count">1</span></button>
+          </div>
+        </div>
+
+        <div class="car-list" id="carList"></div>
+      </div>
+
+      <!-- ========== DETAIL VIEW ========== -->
+      <div class="view" id="view-detail">
+        <div class="detail-hero">
+          <div class="detail-back" data-back>
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </div>
+          <div id="detailHeroImg"></div>
+          <div class="photo-pills">
+            <div class="pill active"></div>
+            <div class="pill"></div>
+            <div class="pill"></div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="detail-title-row">
+            <div>
+              <div class="detail-title" id="detailTitle">Ford Ranger XL</div>
+              <div class="detail-sub" id="detailSub">2019 · 96.500 km · 4x2</div>
+            </div>
+            <div class="detail-status" id="detailStatus">Disponible</div>
+          </div>
+
+          <div class="price-block-large">
+            <div class="label">Precio de venta</div>
+            <div class="amount">
+              <span class="cur">USD</span>
+              <span class="num" id="detailPrice">18.500</span>
+            </div>
+            <div class="actions">
+              <button class="pill-btn primary" onclick="goView('calc')">
+                <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="3" rx="0.5"/></svg>
+                Simular cuota
+              </button>
+              <button class="pill-btn green" onclick="openShare()">
+                <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-12 6.9L4 20l1.1-5A8 8 0 1 1 21 12z"/></svg>
+                Compartir
+              </button>
+            </div>
+          </div>
+
+          <div class="specs" id="detailSpecs"></div>
+
+          <div class="internal-block">
+            <div class="header">
+              <div class="ti">
+                <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                Solo socios
+              </div>
+            </div>
+            <div class="internal-row"><span>Costo de compra</span><span class="val">USD 14.500</span></div>
+            <div class="internal-row"><span>Gastos asociados</span><span class="val">USD 850</span></div>
+            <div class="internal-row total"><span>Margen estimado</span><span class="val">USD 3.150</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========== CARGAR NUEVO VIEW ========== -->
+      <div class="view" id="view-add">
+        <div class="form-section">
+          <h1>Nuevo auto</h1>
+          <p class="sub">Cargá los datos. David lo va a ver al instante.</p>
+
+          <div class="upload-area">
+            <div class="icon-wrap">
+              <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+            </div>
+            <div class="text">Subí fotos del auto</div>
+            <div class="hint">Hasta 8 imágenes · JPG/PNG</div>
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>Marca</label>
+              <select class="select">
+                <option>Ford</option><option>Toyota</option><option>Volkswagen</option>
+                <option>Chevrolet</option><option>Renault</option><option>Fiat</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Modelo</label>
+              <input class="input" placeholder="Ranger XL" />
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label>Año</label>
+              <input class="input" placeholder="2019" />
+            </div>
+            <div class="field">
+              <label>Kilómetros</label>
+              <input class="input" placeholder="96.500" />
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label>Combustible</label>
+              <select class="select"><option>Diésel</option><option>Nafta</option><option>GNC</option></select>
+            </div>
+            <div class="field">
+              <label>Caja</label>
+              <select class="select"><option>Manual</option><option>Automática</option></select>
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>Costo de compra (USD)</label>
+              <input class="input" placeholder="14.500" />
+            </div>
+            <div class="field">
+              <label>Precio venta (USD)</label>
+              <input class="input" placeholder="18.500" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Estado</label>
+            <select class="select"><option>Disponible</option><option>Reservado</option><option>Vendido</option></select>
+          </div>
+
+          <button class="submit-btn" onclick="showToast('Auto guardado. David ya lo ve.'); goView('stock');">
+            Guardar y publicar
+          </button>
+        </div>
+      </div>
+
+      <!-- ========== CALCULADORA VIEW ========== -->
+      <div class="view" id="view-calc">
+        <div class="calc-section">
+          <h1>Simulador</h1>
+          <p class="sub">Calculá la cuota mensual frente al cliente.</p>
+
+          <div class="calc-out">
+            <div class="lab">Cuota mensual</div>
+            <div class="cuota">
+              <span class="cur">USD</span>
+              <span class="num" id="outCuota">485</span>
+              <span class="per">/mes</span>
+            </div>
+            <div class="calc-extras">
+              <div class="item">
+                <div class="lb">Total a pagar</div>
+                <div class="vl">USD <span id="outTotal">17.460</span></div>
+              </div>
+              <div class="item">
+                <div class="lb">Intereses</div>
+                <div class="vl">USD <span id="outInt">3.460</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slider-card">
+            <div class="head">
+              <span class="lb">Precio del auto</span>
+              <span class="vl"><span class="pre">USD</span><span id="vp">18.500</span></span>
+            </div>
+            <input type="range" id="rPrecio" min="5000" max="50000" step="500" value="18500">
+          </div>
+
+          <div class="slider-card">
+            <div class="head">
+              <span class="lb">Anticipo</span>
+              <span class="vl"><span class="pre">USD</span><span id="va">4.500</span></span>
+            </div>
+            <input type="range" id="rAnticipo" min="0" max="40000" step="500" value="4500">
+          </div>
+
+          <div class="slider-card">
+            <div class="head">
+              <span class="lb">Plazo</span>
+              <span class="vl"><span id="vm">36</span> meses</span>
+            </div>
+            <input type="range" id="rPlazo" min="12" max="60" step="6" value="36">
+          </div>
+
+          <div class="slider-card">
+            <div class="head">
+              <span class="lb">Tasa anual</span>
+              <span class="vl"><span id="vt">22</span>%</span>
+            </div>
+            <input type="range" id="rTasa" min="5" max="80" step="1" value="22">
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PERFIL VIEW ========== -->
+      <div class="view" id="view-profile">
+        <div class="profile-card">
+          <div class="av-big">F</div>
+          <div class="info">
+            <div class="name">Franco Saccone</div>
+            <div class="role">Socio · DF Autos</div>
+          </div>
+        </div>
+
+        <div class="partner-card">
+          <div class="av">D</div>
+          <div class="body">
+            <div class="pname">David Azcuénaga</div>
+            <div class="pstatus">Conectado · viendo stock</div>
+          </div>
+        </div>
+
+        <div class="menu-list">
+          <div class="menu-item">
+            <div class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 4v4h-4"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 20v-4h4"/></svg></div>
+            <span class="title">Sincronizar datos</span>
+            <svg class="arr" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="menu-item">
+            <div class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-12 6.9L4 20l1.1-5A8 8 0 1 1 21 12z"/></svg></div>
+            <span class="title">Configurar WhatsApp</span>
+            <svg class="arr" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="menu-item">
+            <div class="ic-wrap"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"/></svg></div>
+            <span class="title">Backups y seguridad</span>
+            <svg class="arr" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="menu-item">
+            <div class="ic-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            <span class="title">Ajustes</span>
+            <svg class="arr" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" id="fab" onclick="goView('add')">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-view="stock">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+        <span class="label">Stock</span>
+      </button>
+      <button class="nav-item" data-view="add">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        <span class="label">Cargar</span>
+      </button>
+      <button class="nav-item" data-view="calc">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="3" rx="0.5"/></svg>
+        <span class="label">Simular</span>
+      </button>
+      <button class="nav-item" data-view="profile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        <span class="label">Perfil</span>
+      </button>
+    </nav>
+
+    <!-- SHARE MODAL -->
+    <div class="modal-backdrop" id="modalBg" onclick="closeShare()"></div>
+    <div class="modal" id="modalShare">
+      <div class="modal-handle"></div>
+      <h3>Compartir ficha del auto</h3>
+      <p class="sub">Generamos un link público para mandarle al cliente.</p>
+
+      <div class="share-preview">
+        <div class="ph" id="sharePreviewImg"></div>
+        <div class="meta">
+          <div class="t" id="shareTitle">Ford Ranger XL · 2019</div>
+          <div class="p">USD <strong id="sharePrice">18.500</strong> · 96.500 km · Disponible</div>
+        </div>
+      </div>
+
+      <div class="share-actions">
+        <button class="pill-btn share-wa" onclick="showToast('Abriendo WhatsApp...'); closeShare();">
+          <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-12 6.9L4 20l1.1-5A8 8 0 1 1 21 12z"/></svg>
+          WhatsApp
+        </button>
+        <button class="pill-btn share-link" onclick="showToast('Link copiado al portapapeles'); closeShare();">
+          <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          Copiar link
+        </button>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+      <span id="toastText">Guardado</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ============ DATA ============
+  const SVG_BG_COLORS = [
+    ['#0F1B3D', '#1E3A8A'],
+    ['#1F2937', '#374151'],
+    ['#0E7490', '#155E75'],
+    ['#7C2D12', '#9A3412'],
+    ['#581C87', '#6B21A8'],
+    ['#15803D', '#166534'],
+  ];
+
+  function carSilhouette(idx, large=false) {
+    const [c1, c2] = SVG_BG_COLORS[idx % SVG_BG_COLORS.length];
+    const w = large ? 360 : 220;
+    return `
+      <svg viewBox="0 0 360 145" xmlns="http://www.w3.org/2000/svg" style="background: linear-gradient(135deg, ${c1}, ${c2}); width: 100%; height: 100%;" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="g${idx}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#fff" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <circle cx="290" cy="-20" r="60" fill="white" opacity="0.08"/>
+        <circle cx="40" cy="120" r="50" fill="white" opacity="0.05"/>
+        <g transform="translate(40, 30)" fill="url(#g${idx})" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linejoin="round">
+          <!-- car body -->
+          <path d="M10 60 L30 35 Q40 25 55 25 L185 25 Q205 25 215 38 L255 38 Q270 38 270 50 L270 70 Q270 75 265 75 L240 75 Q235 60 220 60 Q205 60 200 75 L80 75 Q75 60 60 60 Q45 60 40 75 L15 75 Q10 75 10 70 Z"/>
+          <!-- windows -->
+          <path d="M55 32 L65 50 L130 50 L130 32 Z" fill="white" opacity="0.18"/>
+          <path d="M135 32 L135 50 L195 50 Q200 50 200 45 L200 38 Q200 32 195 32 Z" fill="white" opacity="0.18"/>
+        </g>
+        <!-- wheels -->
+        <circle cx="100" cy="105" r="14" fill="rgba(255,255,255,0.95)" stroke="${c2}" stroke-width="3"/>
+        <circle cx="100" cy="105" r="6" fill="${c2}"/>
+        <circle cx="260" cy="105" r="14" fill="rgba(255,255,255,0.95)" stroke="${c2}" stroke-width="3"/>
+        <circle cx="260" cy="105" r="6" fill="${c2}"/>
+      </svg>
+    `;
+  }
+
+  const CARS = [
+    { id:1, slug:'car-1', make:'ford', family:'ranger', marca:'Ford', modelo:'Ranger XL', year:2019, km:96500, price:18500, costo:14500, gastos:850, status:'disponible', combustible:'Diésel', caja:'Manual', color:'Blanco' },
+    { id:2, slug:'car-2', make:'volkswagen', family:'amarok', marca:'Volkswagen', modelo:'Amarok V6', year:2018, km:128000, price:22500, costo:18800, gastos:1200, status:'reservado', combustible:'Diésel', caja:'Automática', color:'Gris' },
+    { id:3, slug:'car-3', make:'toyota', family:'hilux', marca:'Toyota', modelo:'Hilux SR', year:2020, km:74000, price:31500, costo:26200, gastos:1500, status:'disponible', combustible:'Diésel', caja:'Manual', color:'Negro' },
+    { id:4, slug:'car-4', make:'chevrolet', family:'onix', marca:'Chevrolet', modelo:'Onix LT', year:2021, km:48000, price:12800, costo:10500, gastos:600, status:'disponible', combustible:'Nafta', caja:'Manual', color:'Rojo' },
+    { id:5, slug:'car-5', make:'ford', family:'focus', marca:'Ford', modelo:'Focus SE', year:2016, km:142000, price:9800, costo:7900, gastos:480, status:'vendido', combustible:'Nafta', caja:'Manual', color:'Azul' },
+    { id:6, slug:'car-6', make:'renault', family:'kangoo', marca:'Renault', modelo:'Kangoo Express', year:2018, km:108000, price:11200, costo:9200, gastos:550, status:'reservado', combustible:'Nafta', caja:'Manual', color:'Blanco' },
+  ];
+
+  // Devuelve el HTML de la foto del auto con cadena de fallback:
+  // 1) ./cars/{slug}.jpg (foto que pongas vos)
+  // 2) imagin.studio CDN (render por marca/modelo/año)
+  // 3) silueta SVG (último recurso)
+  function carPhoto(car, idx, large=false) {
+    const localUrl = `./cars/${car.slug}.jpg`;
+    const cdnUrl = `https://cdn.imagin.studio/getimage?customer=img&make=${car.make}&modelFamily=${car.family}&modelYear=${car.year}&angle=23&zoomType=relative&zoomLevel=fullscreen&width=800`;
+    const svg = carSilhouette(idx, large);
+    // Cadena de fallback inline en onerror
+    return `
+      <img class="car-img" alt="${car.marca} ${car.modelo}"
+           src="${localUrl}"
+           data-cdn="${cdnUrl}"
+           onerror="if(!this.dataset.tried){this.dataset.tried=1;this.src=this.dataset.cdn;}else{this.style.display='none';const f=this.parentNode.querySelector('.fallback-svg');if(f)f.classList.add('visible');}">
+      <div class="fallback-svg">${svg}</div>
+    `;
+  }
+
+  function fmt(n) { return n.toLocaleString('es-AR', { maximumFractionDigits: 0 }); }
+
+  // ============ RENDER STOCK ============
+  const carList = document.getElementById('carList');
+  CARS.forEach((c, i) => {
+    const margin = c.price - c.costo - c.gastos;
+    const card = document.createElement('div');
+    card.className = 'car-card';
+    card.onclick = () => openDetail(c, i);
+    card.innerHTML = `
+      <div class="car-photo">
+        ${carPhoto(c, i)}
+        <div class="status-tag ${c.status}">${c.status}</div>
+      </div>
+      <div class="car-info">
+        <div class="car-title-row">
+          <div class="car-title">${c.marca} ${c.modelo}</div>
+          <div class="car-price"><span class="cur">USD </span>${fmt(c.price)}</div>
+        </div>
+        <div class="car-meta">
+          <span class="item">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            ${c.year}
+          </span>
+          <span class="item">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h18M3 12l4-4M3 12l4 4"/></svg>
+            ${fmt(c.km)} km
+          </span>
+          <span class="margin">+USD ${fmt(margin)}</span>
+        </div>
+      </div>
+    `;
+    carList.appendChild(card);
+  });
+
+  // ============ NAVIGATION ============
+  function goView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === name));
+    // FAB visible only on stock
+    document.getElementById('fab').style.display = (name === 'stock') ? 'flex' : 'none';
+    document.querySelectorAll('.view')[0].parentElement.scrollTop = 0;
+  }
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => goView(btn.dataset.view));
+  });
+  document.querySelector('[data-back]').addEventListener('click', () => goView('stock'));
+
+  // ============ DETAIL ============
+  let currentCar = CARS[0];
+  function openDetail(c, idx) {
+    currentCar = c;
+    document.getElementById('detailTitle').textContent = `${c.marca} ${c.modelo}`;
+    document.getElementById('detailSub').textContent = `${c.year} · ${fmt(c.km)} km · ${c.combustible}`;
+    document.getElementById('detailPrice').textContent = fmt(c.price);
+    document.getElementById('detailHeroImg').innerHTML = carPhoto(c, idx, true);
+    document.getElementById('detailHeroImg').style.cssText = 'width:100%;height:100%;position:relative;';
+
+    // Status badge (color por estado)
+    const status = document.getElementById('detailStatus');
+    const cap = c.status.charAt(0).toUpperCase() + c.status.slice(1);
+    status.textContent = cap;
+    const statusColors = {
+      disponible: ['#10B981', 'rgba(16,185,129,0.1)'],
+      reservado:  ['#D97706', 'rgba(245,158,11,0.12)'],
+      vendido:    ['#6B7280', 'rgba(107,114,128,0.12)']
+    };
+    const [fg, bg] = statusColors[c.status] || statusColors.disponible;
+    status.style.color = fg;
+    status.style.background = bg;
+
+    // Specs dinámicas
+    const specs = [
+      ['Marca', c.marca],
+      ['Modelo', c.modelo],
+      ['Año', c.year],
+      ['Combustible', c.combustible],
+      ['Transmisión', c.caja],
+      ['Color', c.color],
+    ];
+    document.getElementById('detailSpecs').innerHTML = specs.map(([l,v]) =>
+      `<div class="spec"><div class="label">${l}</div><div class="value">${v}</div></div>`
+    ).join('');
+
+    // Update internal block
+    const internal = document.querySelector('.internal-block');
+    internal.querySelectorAll('.internal-row .val')[0].textContent = `USD ${fmt(c.costo)}`;
+    internal.querySelectorAll('.internal-row .val')[1].textContent = `USD ${fmt(c.gastos)}`;
+    internal.querySelectorAll('.internal-row .val')[2].textContent = `USD ${fmt(c.price - c.costo - c.gastos)}`;
+
+    // Update share preview
+    document.getElementById('shareTitle').textContent = `${c.marca} ${c.modelo} · ${c.year}`;
+    document.getElementById('sharePrice').textContent = fmt(c.price);
+    document.getElementById('sharePreviewImg').innerHTML = carPhoto(c, idx, true);
+    document.getElementById('sharePreviewImg').style.cssText = 'width:100%;height:110px;position:relative;overflow:hidden;';
+
+    // Update calc with car price
+    document.getElementById('rPrecio').value = c.price;
+    document.getElementById('rAnticipo').value = Math.round(c.price * 0.25);
+    updateSliders();
+    calc();
+
+    goView('detail');
+    // Hide bottom nav active state since detail isn't a tab
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  }
+
+  // ============ SHARE MODAL ============
+  function openShare() {
+    document.getElementById('modalBg').classList.add('show');
+    document.getElementById('modalShare').classList.add('show');
+  }
+  function closeShare() {
+    document.getElementById('modalBg').classList.remove('show');
+    document.getElementById('modalShare').classList.remove('show');
+  }
+
+  // ============ TOAST ============
+  let toastTimer;
+  function showToast(text) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = text;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // ============ CALCULATOR ============
+  const rPrecio = document.getElementById('rPrecio');
+  const rAnticipo = document.getElementById('rAnticipo');
+  const rPlazo = document.getElementById('rPlazo');
+  const rTasa = document.getElementById('rTasa');
+  function updateSliderFill(input) {
+    const min = parseFloat(input.min);
+    const max = parseFloat(input.max);
+    const val = parseFloat(input.value);
+    const pct = ((val - min) / (max - min)) * 100;
+    input.style.setProperty('--val', pct + '%');
+  }
+  function updateSliders() {
+    [rPrecio, rAnticipo, rPlazo, rTasa].forEach(updateSliderFill);
+  }
+  function calc() {
+    let precio = parseInt(rPrecio.value);
+    let anticipo = Math.min(parseInt(rAnticipo.value), precio - 500);
+    const plazo = parseInt(rPlazo.value);
+    const tasaAnual = parseInt(rTasa.value);
+    const monto = precio - anticipo;
+    const i = (tasaAnual / 100) / 12;
+    const cuota = monto * (i / (1 - Math.pow(1 + i, -plazo)));
+    const total = cuota * plazo;
+    const intereses = total - monto;
+
+    document.getElementById('vp').textContent = fmt(precio);
+    document.getElementById('va').textContent = fmt(anticipo);
+    document.getElementById('vm').textContent = plazo;
+    document.getElementById('vt').textContent = tasaAnual;
+    document.getElementById('outCuota').textContent = fmt(cuota);
+    document.getElementById('outTotal').textContent = fmt(total);
+    document.getElementById('outInt').textContent = fmt(intereses);
+    updateSliders();
+  }
+  [rPrecio, rAnticipo, rPlazo, rTasa].forEach(el => el.addEventListener('input', calc));
+  calc();
+</script>
+
+</body>
+</html>
